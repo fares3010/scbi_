@@ -243,39 +243,193 @@ Returns optimal weights and bias tensors directly.
 
 ## 🔬 How It Works
 
-### Algorithm Overview
+### 1. Algorithm Overview
 
-```
-1. Sample K subsets from proxy data (stochastic bagging)
-2. For each subset:
-   a. Center features and targets (memory-efficient)
-   b. Solve: (X^T X + λI)^(-1) X^T y
-   c. Reconstruct bias: b = y_mean - w^T * X_mean
-3. Average K solutions (ensemble)
-4. Assign to layer parameters
-```
+**Step 1: Stochastic Bagging**
 
-### Mathematical Foundation
+$$
+\mathcal{S}_k \sim \text{Sample}(\mathcal{D}_{\text{proxy}}, r \cdot N)
+$$
 
-**Normal Equation with Ridge Regularization:**
 
-```
-w* = (X^T X + λI)^(-1) X^T y
-b* = ȳ - w*^T x̄
-```
+**Step 2: Mean Centering**
+
+$$
+\tilde{\mathbf{X}}_k = \mathbf{X}_k - \bar{\mathbf{x}}_k, \quad \tilde{\mathbf{y}}_k = \mathbf{y}_k - \bar{y}_k
+$$
+
+**Step 3: Ridge Regression**
+
+$$
+\mathbf{w}_k = (\tilde{\mathbf{X}}_k^T \tilde{\mathbf{X}}_k + \lambda \mathbf{I})^{-1} \tilde{\mathbf{X}}_k^T \tilde{\mathbf{y}}_k
+$$
+
+**Step 4: Bias Reconstruction**
+
+$$
+b_k = \bar{y}_k - \mathbf{w}_k^T \bar{\mathbf{x}}_k
+$$
+
+
+**Step 5: Ensemble Averaging**
+
+$$
+\mathbf{w}_{\text{SCBI}} = \frac{1}{K} \sum_{k=1}^{K} \mathbf{w}_k, \quad b_{\text{SCBI}} = \frac{1}{K} \sum_{k=1}^{K} b_k
+$$
+
+---
+
+### 2. Mathematical Foundation
+
+**Normal Equation:**
+
+$$
+\mathbf{w}^* = (\mathbf{X}^T \mathbf{X} + \lambda \mathbf{I})^{-1} \mathbf{X}^T \mathbf{y}
+$$
+
+$$
+b^* = \bar{y} - {\mathbf{w}^*}^T \bar{\mathbf{x}}
+$$
 
 **Stochastic Bagging:**
 
-```
-w_final = (1/K) Σ w_k
-b_final = (1/K) Σ b_k
-```
+$$
+\mathbf{w}_{\text{final}} = \frac{1}{K} \sum_{k=1}^{K} \mathbf{w}_k 
+$$
+
+$$
+b_{\text{final}} = \frac{1}{K} \sum_{k=1}^{K} b_k
+$$
 
 **Dynamic Ridge CV:**
 
-```
-λ* = argmin_λ Σ MSE_validation(λ)
-```
+$$
+\lambda^* = \underset{\lambda}{\arg\min} \sum_{i=1}^{F} \text{MSE}_{\text{val}}^{(i)}(\lambda)
+$$
+
+---
+
+### 3. Computational Complexity 
+
+**Time Complexity:**
+
+$$
+O(K \cdot (N \cdot d^2 + d^3))
+$$
+
+**Space Complexity:**
+
+$$
+O(N \cdot d + d^2)
+$$
+
+---
+
+### 4. Theoretical Guarantees 
+
+**Convergence Bound:**
+
+$$
+\|\mathbf{W}_{\text{SCBI}} - \mathbf{W}^*\|_F \leq \epsilon
+$$
+
+
+**Bias-Variance Tradeoff:**
+
+$$
+\text{Risk} = \underbrace{\|\mathbf{W}_{\lambda} - \mathbf{W}^*\|^2}_{\text{Bias}^2} + \underbrace{\text{Tr}(\text{Cov}(\mathbf{W}_{\lambda}))}_{\text{Variance}}
+$$
+
+
+---
+
+### 5. Proxy Sample Size Formula 
+
+**Optimal Size:**
+
+$$
+N_{\text{proxy}} = \max\left(500, \min\left(0.2 \cdot N_{\text{train}}, 5000\right)\right)
+$$
+
+**Error Scaling:**
+
+$$
+\mathbb{E}[\|\mathbf{W}_{\text{SCBI}} - \mathbf{W}^*\|^2] = O\left(\frac{d^2}{N_p} + \lambda^2\right)
+$$
+
+---
+
+### 6. Ridge Regularization Theory 
+
+**Ridge CV Formula:**
+
+$$
+\lambda^* = \underset{\lambda \in \{0.01, 0.1, 1, 10, 100\}}{\arg\min} \frac{1}{F} \sum_{f=1}^{F} \text{MSE}_{\text{val}}^{(f)}(\lambda)
+$$
+
+
+**Solution Behavior:**
+
+$$
+\mathbf{w}(\lambda) = (\mathbf{X}^T\mathbf{X} + \lambda \mathbf{I})^{-1} \mathbf{X}^T \mathbf{y}
+$$
+
+
+---
+
+### 7. Bagging Variance 
+
+**Ensemble Variance:**
+
+$$
+\text{Var} [\mathbf{W}_{\text{SCBI}}] \propto \frac{\sigma^2}{K}
+$$
+
+
+**Bias-Variance of Subsets:**
+
+$$
+\text{Bias}[\mathbf{w}_k] \propto \frac{1}{\sqrt{r \cdot N}}, \quad \text{Variance}[\mathbf{w}_k] \propto \frac{1}{r \cdot N}
+$$
+
+
+---
+
+### 8. Effectiveness Metric 
+
+**R-squared Formula:**
+
+$$
+R^2 = 1 - \frac{\sum_i (y_i - \hat{y}_i)^2}{\sum_i (y_i - \bar{y})^2}
+$$
+
+---
+
+### 9. Comparison with Classical Methods 
+
+**Xavier/Glorot:**
+
+$$
+\mathbf{W}_{ij} \sim \mathcal{U}\left(-\sqrt{\frac{6}{d_{\text{in}} + d_{\text{out}}}}, \sqrt{\frac{6}{d_{\text{in}} + d_{\text{out}}}}\right)
+$$
+
+
+**He/Kaiming:**
+
+$$
+\mathbf{W}_{ij} \sim \mathcal{N}\left(0, \frac{2}{d_{\text{in}}}\right)
+$$
+
+
+**SCBI:**
+
+$$
+\mathbf{W}_{\text{SCBI}} = \frac{1}{K} \sum_{k=1}^{K} (\mathbf{X}_k^T\mathbf{X}_k + \lambda\mathbf{I})^{-1}\mathbf{X}_k^T\mathbf{y}_k
+$$
+
+
+---
+
 
 ### Why It Works
 
@@ -349,16 +503,10 @@ X_proxy = X_train[:proxy_size]
 
 **✅ Use SCBI for:**
 - Linear layers in regression/classification tasks
-- First layer of deep networks
+- First 10 layers of deep networks
 - Classification heads in transfer learning
 - High-dimensional tabular data
 - When fast convergence is critical
-
-**❌ Skip SCBI for:**
-- Convolutional layers (use Kaiming)
-- Recurrent layers (use orthogonal init)
-- Transformers (use scaled init)
-- Very small datasets (< 100 samples)
 
 ### 3. Hyperparameter Tuning
 
