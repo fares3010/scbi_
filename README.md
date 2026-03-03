@@ -25,7 +25,7 @@ A novel neural network initialization method that dramatically improves training
 
 ### 1. Training Dynamics Across Datasets
 
-![Training Curves](fig1_training_curves.png)
+![Training Curves](graphs_/fig1_training_curves.png)
 
 **Figure 1: Training curves comparing SCBI (red) vs standard initialization (blue) across 5 datasets.** Shaded regions show ±1 standard deviation over 5 independent runs. SCBI consistently achieves dramatically lower initial loss and maintains this advantage throughout training.
 
@@ -43,7 +43,7 @@ A novel neural network initialization method that dramatically improves training
 
 ### 2. Initial Loss Comparison
 
-![Initial Loss](fig2_initial_loss.png)
+![Initial Loss](graphs_/fig2_initial_loss.png)
 
 **Figure 2: Initial training loss comparison (epoch 0, before any gradient updates).** Error bars indicate ±1 std over 5 runs. Percentages show improvement magnitude.
 
@@ -64,7 +64,7 @@ The 2.6× difference reflects SCBI's foundation in ridge regression, which direc
 
 ### 3. Convergence Speed Analysis
 
-![Convergence Speedup](fig3_convergence_speedup.png)
+![Convergence Speedup](graphs_/fig3_convergence_speedup.png)
 
 **Figure 3: Epochs required to reach target loss (2× SCBI's initial loss).** Standard initialization (left box in each pair) requires dramatically more epochs than SCBI (right box).
 
@@ -96,7 +96,7 @@ Diabetes training on CPU:
 
 ### 4. Statistical Validation
 
-![Statistical Significance](fig4_significance.png)
+![Statistical Significance](graphs_/fig4_significance.png)
 
 **Figure 4: Statistical significance analysis.** Left: P-values from paired t-tests (all well below α=0.05 threshold). Right: Effect sizes showing substantial improvements across all datasets.
 
@@ -122,7 +122,7 @@ Diabetes training on CPU:
 
 ### 5. Hyperparameter Sensitivity (Ablation Study)
 
-![Ablation Study](fig5_ablation.png)
+![Ablation Study](graphs_/fig5_ablation.png)
 
 **Figure 5: Effect of hyperparameters on SCBI performance.** Orange: initial loss (before training). Blue: final loss (after 30 epochs). Tests conducted on California Housing dataset.
 
@@ -163,7 +163,7 @@ model = SCBILinear(
 
 ### 6. Network Depth Analysis
 
-![Depth Analysis](arch_fig1_depth_analysis.png)
+![Depth Analysis](graphs_/arch_fig1_depth_analysis.png)
 
 **Figure 6: SCBI performance across network depths (1-5 layers).** Left: Initial loss comparison. Right: Improvement percentage vs depth.
 
@@ -187,7 +187,7 @@ model = SCBILinear(
 
 ### 7. Network Width Analysis
 
-![Width Analysis](arch_fig2_width_analysis.png)
+![Width Analysis](graphs_/arch_fig2_width_analysis.png)
 
 **Figure 7: SCBI performance across layer widths (32-532 neurons).** Left: Loss comparison. Right: Improvement curve showing inverted-U relationship.
 
@@ -210,7 +210,7 @@ model = SCBILinear(
 
 ### 8. Activation Function Analysis
 
-![Activation Analysis](arch_fig3_activation_analysis.png)
+![Activation Analysis](graphs_/arch_fig3_activation_analysis.png)
 
 **Figure 8: SCBI with different activation functions.** All modern activations benefit from SCBI, with smooth functions showing largest gains.
 
@@ -234,7 +234,7 @@ model = SCBILinear(
 
 ### 9. Regularization Compatibility
 
-![Regularization Analysis](arch_fig4_regularization_analysis.png)
+![Regularization Analysis](graphs_/arch_fig4_regularization_analysis.png)
 
 **Figure 9: SCBI with modern regularization techniques.** Left: Improvement percentages. Right: Statistical significance (all p < 0.05).
 
