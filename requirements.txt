@@ -1,0 +1,42 @@
+# SCBI Complete Requirements
+# All dependencies for full functionality
+
+# ============== CORE DEPENDENCIES ==============
+torch>=1.9.0,<3.0.0
+numpy>=1.19.0,<2.0.0
+scikit-learn>=0.24.0,<2.0.0
+
+# ============== BENCHMARKS & EXPERIMENTS ==============
+pandas>=1.2.0
+matplotlib>=3.3.0
+seaborn>=0.11.0
+scipy>=1.6.0
+
+# ============== UTILITIES ==============
+tqdm>=4.50.0
+
+# ============== DEVELOPMENT & TESTING ==============
+pytest>=7.0.0
+pytest-cov>=3.0.0
+black>=22.0.0
+flake8>=4.0.0
+isort>=5.10.0
+mypy>=0.950
+
+# ============== DOCUMENTATION ==============
+sphinx>=4.5.0
+sphinx-rtd-theme>=1.0.0
+
+# ============== JUPYTER SUPPORT ==============
+jupyter>=1.0.0
+ipykernel>=6.0.0
+ipython>=7.30.0
+notebook>=6.4.0
+
+# ============== OPTIONAL GPU ACCELERATION ==============
+# Uncomment if you have CUDA installed:
+# cupy-cuda11x>=9.0.0
+
+# ============== BUILD TOOLS ==============
+setuptools>=60.0.0
+wheel>=0.37.0
