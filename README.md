@@ -360,6 +360,41 @@ model.init_scbi_layers(X_proxy, y_proxy)
 # Train with 87× faster convergence!
 ```
 
+### Auto-Tuned Classification (2D Grid Search)
+
+Standard PyTorch initialization leaves classification networks at random guessing (e.g., 10% accuracy on 10 classes) because weights are centered around zero, pushing Softmax/Sigmoid outputs into maximum uncertainty. 
+
+SCBI solves this by mapping classification targets into the **logit space** (e.g., $\pm 2.0$). 
+
+For classification tasks, SCBI automatically triggers a **2D Grid Search Cross-Validation**. It dynamically tunes both the **Ridge Penalty ($\lambda$)** and the **Confidence Scale** to find the mathematical "Goldilocks zone" for your specific dataset—maximizing Epoch 0 accuracy without exploding the Cross-Entropy loss.
+
+### How to use it:
+Simply pass `task="classification"` when initializing your network. SCBI will automatically detect if your problem is Binary (BCE) or Multi-Class (Cross-Entropy) and apply the correct target mapping.
+
+```python
+from scbi import create_scbi_mlp
+import torch
+
+# 1. Grab a tiny proxy batch of your data (e.g., 10000 samples)
+X_proxy, y_proxy = get_your_proxy_data() 
+
+# 2. Create your deep network
+model = create_scbi_mlp(
+    input_dim=784, 
+    hidden_dims=[256, 128], 
+    output_dim=10, 
+    tune_ridge=True 
+)
+
+# 3. Initialize with Classification Auto-Tuning
+model.init_scbi_layers(
+    X_proxy, 
+    y_proxy, 
+    task="classification",  # <--- Triggers the 2D Grid Search
+    verbose=True
+)
+
+```
 ---
 
 ## 📊 Reproduce Our Results
